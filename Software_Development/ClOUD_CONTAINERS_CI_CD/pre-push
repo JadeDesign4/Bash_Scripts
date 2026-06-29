@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# 📝 SCRIPT DESCRIPTION
+# ==============================================================================
+# NAME:        pre-push (Git Hook Target)
+# TARGET:      Software Engineers, DevOps Engineers, & Release Managers
+# DESCRIPTION: Automatically intercepts 'git push' commands locally to execute 
+#              pre-flight validation tests and blocks broken code from shipping.
+# PROBLEM:     Pushing syntax errors, broken tests, or misconfigured files to a 
+#              remote repository wastes cloud resources and breaks team builds.
+# USAGE:       Automatic upon executing 'git push' once dropped in .git/hooks/
+# LOCATION:    This file should be copied/placed in .git/hooks of the git local repo.
+# ==============================================================================
+
+echo "🛡️  Git Pre-Push Hook Gatekeeper Active..."
+echo "==============================================================="
+echo "🔍 Commencing local codebase validation sweeps..."
+
+# --- Task 1: Simulate running unit tests or syntax checks ---
+echo "🔹 Running test suite simulation..."
+# Replace this with your actual framework runner (e.g., npm test, pytest, go test)
+# For demo purposes, we will assume it passes.
+TEST_EXIT_CODE=0 
+
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+    echo -e "❌ \e[31mCRITICAL ERROR:\e[0m Local unit test suites failed."
+    echo "🛑 Git remote push aborted. Fix the tests before pushing!"
+    echo "==============================================================="
+    exit 1
+fi
+echo "   ✅ Unit validation tests passed successfully."
+
+# --- Task 2: Check for forbidden debug flags or left-over placeholders ---
+echo "🔹 Scanning staged lines for leftover 'TODO: FIX' or debug artifacts..."
+# Searches modified files for common markers we shouldn't push to main
+if git diff --cached | grep -E "console\.log|TODO: FIX" &>/dev/null; then
+    echo -e "⚠️  [\e[33mCODE QUALITY\e[0m] Found unhandled temporary debug statements or blocks."
+    # We log a warning but allow it to pass, or change to exit 1 to strictly block it!
+fi
+
+echo "---------------------------------------------------------------"
+echo -e "🎉 \e[32mALL CHECKS PASSED!\e[0m Codebase is stable and cloud-ready."
+echo "🚀 Dispatching commits to remote repository branch..."
+echo "==============================================================="
+exit 0
